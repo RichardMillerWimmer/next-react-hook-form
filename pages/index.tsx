@@ -12,7 +12,7 @@ interface FormData {
 }
 
 const Home: NextPage = () => {
-  const { register, handleSubmit, formState: {errors} } = useForm<FormData>();
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
 
 
 
@@ -23,24 +23,32 @@ const Home: NextPage = () => {
       })}>
         <div>
           <label htmlFor='name'>Name</label>
-          <input type='text' {...register('name', { required: true})} />
+          <input type='text' {...register('name', { required: 'required' })} />
+          {errors.name ? <div>{errors.name.message}</div> : ''}
         </div>
-        {errors.name ? <div>{errors.name.message}</div> : ''}
         <div>
           <label htmlFor='email'>Email</label>
-          <input type='text' {...register('email', { required: true})} />
+          <input type='text' {...register('email', { required: 'required' })} />
+          {errors.email ? <div>{errors.email.message}</div> : ''}
         </div>
-        {errors.email ? <div>{errors.email.message}</div> : ''}
         <div>
           <label htmlFor='password'>Password</label>
-          <input type='text' {...register('password', { required: true})} />
+          <input type='text' {...register('password', {
+            required: 'required', minLength: { value: 8, message: 'must be 8 characters' }, validate: (value) => {
+              return (
+                [/[a-z]/, /[A-Z]/, /[0-9]/, /[^a-zA-Z0-9]/].every((pattern) =>
+                  pattern.test(value)
+                ) || "must include lower, upper, number, and special chars"
+              );
+            },
+          })} />
+          {errors.password ? <div>{errors.password.message}</div> : ''}
         </div>
-        {errors.password ? <div>{errors.password.message}</div> : ''}
         <div>
           <label htmlFor='terms'>Agree to terms</label>
-          <input type='checkbox' {...register('terms', { required: true})} />
+          <input type='checkbox' {...register('terms', { required: 'required' })} />
+          {errors.terms ? <div>{errors.terms.message}</div> : ''}
         </div>
-        {errors.terms ? <div>{errors.terms.message}</div> : ''}
         <button type='submit'>Register</button>
       </form>
     </div>
