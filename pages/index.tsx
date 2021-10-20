@@ -15,15 +15,42 @@ interface FormData {
 const Home: NextPage = () => {
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
   const [submitting, setSubmitting] = useState<boolean>(false);
+  const [serverErrors, setServerErrors] = useState<string[]>([]);
 
-  const submitData: SubmitHandler<FormData> = async (data: FormData) => {
-    console.log(data)
+  const submitData: SubmitHandler<FormData> = async (formData: FormData) => {
+    console.log(formData)
     setSubmitting(true)
-    const res = await fetch('/api/auth')
+    setServerErrors([]);
+    const response = await fetch('/api/auth', {
+      method: "POST", 
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        terms: formData.terms
+      })
+    })
+    const data = await response.json();
+
+    if (data.errors) {
+      setServerErrors(data.errors)
+    } else {
+      console.log('success redirect to landing page')
+    }
+
+    setSubmitting(false);
   }
 
   return (
     <div className={styles.container}>
+      {serverErrors && (
+        <ul>
+          {serverErrors.map((error) => (
+            <li key={error}>{error}</li>
+          ))}
+        </ul>
+      )}
       <form onSubmit={handleSubmit(submitData)}>
         <div>
           <label htmlFor='name'>Name</label>
